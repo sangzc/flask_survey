@@ -1,7 +1,7 @@
 from flask import Flask, request, session, render_template, redirect
 from flask_debugtoolbar import DebugToolbarExtension
 from surveys import satisfaction_survey
-
+from pprint import pprint
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "oh-so-secret"
@@ -13,8 +13,7 @@ questions = satisfaction_survey.questions
 @app.route('/')
 def show_homepage():
     """ displays title of survey, instructions, and button to start survey """
-    session['response'] = []
-
+    session.clear()
     title = satisfaction_survey.title
     instructions = satisfaction_survey.instructions
 
@@ -26,7 +25,8 @@ def redirect_homepage():
 
 @app.route('/questions/<int:number>', methods=["POST"])
 def redirect_questionpage(number):
-
+    answer = request.form['choice']
+    session['response'] = session.get('response', []) + [answer]
     next_route = f'/questions/{number}'
     return redirect(next_route)
 
